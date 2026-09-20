@@ -1,0 +1,141 @@
+{
+  "common": {
+    "appName": "पटीदार स्टोन क्रेशर",
+    "loading": "लोड हो रहा है…",
+    "retry": "फिर कोशिश करें",
+    "back": "वापस",
+    "save": "सेव करें",
+    "cancel": "रद्द करें",
+    "languageName": "English"
+  },
+  "login": {
+    "title": "साइन इन करें",
+    "subtitle": "ऑर्डर देखने के लिए अपनी पहचान डालें",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "submit": "साइन इन",
+    "submitting": "साइन इन हो रहा है…",
+    "error": "ईमेल या पासवर्ड गलत है। फिर कोशिश करें।",
+    "demoHint": "डेमो लॉगिन: staff@crusher.com / Staff@123"
+  },
+  "header": {
+    "logout": "लॉग आउट",
+    "customers": "ग्राहक"
+  },
+  "dashboard": {
+    "title": "ऑर्डर",
+    "newOrder": "+ नया ऑर्डर",
+    "totalOrders": "ऑर्डर",
+    "totalAmount": "कुल रकम",
+    "totalReceived": "मिला हुआ",
+    "totalPending": "बाकी",
+    "noOrders": "इस महीने कोई ऑर्डर नहीं।",
+    "noOrdersHint": "पहला ऑर्डर जोड़ने के लिए \"नया ऑर्डर\" दबाएँ।",
+    "loadFailed": "ऑर्डर लोड नहीं हो सके।",
+    "orderNo": "ऑर्डर",
+    "balance": "बाकी"
+  },
+  "orderForm": {
+    "title": "नया ऑर्डर",
+    "phone": "ग्राहक का फ़ोन नंबर",
+    "name": "ग्राहक का नाम",
+    "existingCustomer": "पुराना ग्राहक",
+    "nameLocked": "पुराना ग्राहक — नाम बदला नहीं जा सकता",
+    "village": "गाँव",
+    "material": "माल",
+    "grade": "ग्रेड",
+    "gradeOther": "अन्य",
+    "quantity": "ट्रॉली",
+    "decreaseQuantity": "एक ट्रॉली कम",
+    "increaseQuantity": "एक ट्रॉली ज़्यादा",
+    "rate": "प्रति ट्रॉली दर (₹)",
+    "totalComputed": "कुल",
+    "totalBreakdown": "= {quantity} × {rate}",
+    "editTotal": "रकम बदलें",
+    "useComputedTotal": "ट्रॉली × दर से निकालें",
+    "totalOverride": "कुल रकम (₹)",
+    "paymentType": "भुगतान का तरीका",
+    "note": "नोट (वैकल्पिक)",
+    "notePlaceholder": "जैसे: 12 बजे तक भेजना है",
+    "totalAmount": "कुल रकम (₹)",
+    "status": "भुगतान की स्थिति",
+    "unpaid": "बकाया",
+    "partiallyPaid": "अधूका भुगतान",
+    "paid": "भुगतान हो गया",
+    "amountReceived": "अब तक मिला हुआ पैसा (₹)",
+    "saveOrder": "ऑर्डर सेव करें",
+    "saving": "सेव हो रहा है…",
+    "saved": "ऑर्डर सेव हो गया!",
+    "errorPhone": "सही 10 अंकों का फ़ोन नंबर डालें",
+    "errorName": "ग्राहक का नाम डालें",
+    "errorVillage": "गाँव का नाम डालें",
+    "errorMaterial": "माल चुनें",
+    "errorRate": "प्रति ट्रॉली दर डालें, या कुल रकम खुद बदलें",
+    "errorAmount": "कुल रकम डालें",
+    "errorReceived": "मिला हुआ पैसा कुल रकम से कम होना चाहिए",
+    "errorSave": "ऑर्डर सेव नहीं हुआ। फिर कोशिश करें।"
+  },
+  "customers": {
+    "title": "ग्राहक",
+    "searchPlaceholder": "नाम या फ़ोन खोजें",
+    "ordersCount": "{count} ऑर्डर",
+    "pending": "बाकी {amount}",
+    "totalOrders": "ऑर्डर",
+    "totalAmount": "कुल रकम",
+    "totalPending": "बाकी",
+    "noResults": "कोई ग्राहक नहीं मिला।",
+    "noResultsHint": "पहले ऑर्डर के साथ ग्राहक अपने आप जुड़ जाता है।",
+    "loadFailed": "ग्राहक लोड नहीं हुए।"
+  },
+  "customerOrders": {
+    "title": "ग्राहक के ऑर्डर",
+    "noOrders": "अभी कोई ऑर्डर नहीं।",
+    "notFound": "ग्राहक नहीं मिला।"
+  },
+  "pagination": {
+    "label": "पृष्ठ नंबर",
+    "page": "{current} / {total}",
+    "prev": "पिछला पृष्ठ",
+    "next": "अगला पृष्ठ"
+  },
+  "material": {
+    "ret": "रेत",
+    "gitti": "गिट्टी",
+    "both": "दोनों"
+  },
+  "payment": {
+    "nagad": "नगद",
+    "udhaar": "उधार",
+    "online": "ऑनलाइन"
+  },
+  "orderDetail": {
+    "title": "ऑर्डर की जानकारी",
+    "orderNo": "ऑर्डर नंबर",
+    "customer": "ग्राहक",
+    "phone": "फ़ोन",
+    "village": "गाँव",
+    "material": "माल",
+    "grade": "ग्रेड",
+    "quantity": "ट्रॉली",
+    "rate": "प्रति ट्रॉली दर",
+    "paymentType": "भुगतान",
+    "note": "नोट",
+    "date": "तारीख",
+    "total": "कुल रकम",
+    "received": "मिला हुआ",
+    "balance": "बाकी",
+    "status": "स्थिति",
+    "markPaid": "पूरा पैसा मिल गया",
+    "editReceived": "मिला हुआ पैसा बदलें (₹)",
+    "update": "भुगतान अपडेट करें",
+    "updating": "अपडेट हो रहा है…",
+    "updated": "भुगतान अपडेट हो गया!",
+    "errorUpdate": "अपडेट नहीं हो सका। फिर कोशिश करें।",
+    "notFound": "ऑर्डर नहीं मिला।"
+  },
+  "status": {
+    "unpaid": "बकाया",
+    "partially_paid": "अधूका भुगतान",
+    "paid": "भुगतान हो गया"
+  }
+}

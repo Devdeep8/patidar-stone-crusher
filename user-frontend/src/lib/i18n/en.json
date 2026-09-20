@@ -1,0 +1,141 @@
+{
+  "common": {
+    "appName": "Patidar Stone Crusher",
+    "loading": "Loading…",
+    "retry": "Try Again",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "languageName": "हिंदी"
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Enter your details to manage orders",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "submitting": "Signing in…",
+    "error": "Wrong email or password. Please try again.",
+    "demoHint": "Demo login: staff@crusher.com / Staff@123"
+  },
+  "header": {
+    "logout": "Log Out",
+    "customers": "Customers"
+  },
+  "dashboard": {
+    "title": "Orders",
+    "newOrder": "+ New Order",
+    "totalOrders": "Orders",
+    "totalAmount": "Total Amount",
+    "totalReceived": "Received",
+    "totalPending": "Pending",
+    "noOrders": "No orders this month.",
+    "noOrdersHint": "Tap \"New Order\" to add the first one.",
+    "loadFailed": "Could not load orders.",
+    "orderNo": "Order",
+    "balance": "Balance"
+  },
+  "orderForm": {
+    "title": "New Order",
+    "phone": "Customer Phone Number",
+    "name": "Customer Name",
+    "existingCustomer": "Existing customer",
+    "nameLocked": "Saved customer — name cannot be changed",
+    "village": "Village",
+    "material": "Material",
+    "grade": "Grade",
+    "gradeOther": "Other",
+    "quantity": "Trolleys",
+    "decreaseQuantity": "One less trolley",
+    "increaseQuantity": "One more trolley",
+    "rate": "Rate per Trolley (₹)",
+    "totalComputed": "Total",
+    "totalBreakdown": "= {quantity} × {rate}",
+    "editTotal": "Edit Total",
+    "useComputedTotal": "Use Trolleys × Rate",
+    "totalOverride": "Total Amount (₹)",
+    "paymentType": "Payment Mode",
+    "note": "Note (optional)",
+    "notePlaceholder": "e.g. send by 12 o'clock",
+    "totalAmount": "Total Amount (₹)",
+    "status": "Payment Status",
+    "unpaid": "Unpaid",
+    "partiallyPaid": "Partially Paid",
+    "paid": "Paid",
+    "amountReceived": "Amount Received So Far (₹)",
+    "saveOrder": "Save Order",
+    "saving": "Saving…",
+    "saved": "Order saved!",
+    "errorPhone": "Enter a valid 10-digit phone number",
+    "errorName": "Enter customer name",
+    "errorVillage": "Enter the village name",
+    "errorMaterial": "Select the material",
+    "errorRate": "Enter the rate per trolley, or edit the total",
+    "errorAmount": "Enter total amount",
+    "errorReceived": "Received amount must be less than total amount",
+    "errorSave": "Could not save the order. Please try again."
+  },
+  "customers": {
+    "title": "Customers",
+    "searchPlaceholder": "Search name or phone",
+    "ordersCount": "{count} orders",
+    "pending": "Pending {amount}",
+    "totalOrders": "Orders",
+    "totalAmount": "Total Amount",
+    "totalPending": "Pending",
+    "noResults": "No customers found.",
+    "noResultsHint": "Customers are added automatically with their first order.",
+    "loadFailed": "Could not load customers."
+  },
+  "customerOrders": {
+    "title": "Customer Orders",
+    "noOrders": "No orders yet.",
+    "notFound": "Customer not found."
+  },
+  "pagination": {
+    "label": "Pagination",
+    "page": "{current} / {total}",
+    "prev": "Previous page",
+    "next": "Next page"
+  },
+  "material": {
+    "ret": "Sand",
+    "gitti": "Grit",
+    "both": "Both"
+  },
+  "payment": {
+    "nagad": "Cash (Nagad)",
+    "udhaar": "Credit (Udhaar)",
+    "online": "Online"
+  },
+  "orderDetail": {
+    "title": "Order Details",
+    "orderNo": "Order No.",
+    "customer": "Customer",
+    "phone": "Phone",
+    "village": "Village",
+    "material": "Material",
+    "grade": "Grade",
+    "quantity": "Trolleys",
+    "rate": "Rate per Trolley",
+    "paymentType": "Payment Mode",
+    "note": "Note",
+    "date": "Date",
+    "total": "Total Amount",
+    "received": "Received",
+    "balance": "Balance",
+    "status": "Status",
+    "markPaid": "Mark Fully Paid",
+    "editReceived": "Update Received Amount (₹)",
+    "update": "Update Payment",
+    "updating": "Updating…",
+    "updated": "Payment updated!",
+    "errorUpdate": "Could not update. Please try again.",
+    "notFound": "Order not found."
+  },
+  "status": {
+    "unpaid": "Unpaid",
+    "partially_paid": "Partially Paid",
+    "paid": "Paid"
+  }
+}
