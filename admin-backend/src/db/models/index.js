@@ -51,10 +51,12 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
-// Log initialized models and their associations to verify setup
-Object.keys(db).forEach(modelName => {
-  const associations = Object.keys(db[modelName].associations);
-  Logger.info(`Model loaded: ${modelName} with associations: [${associations.join(', ')}]`);
+// One summary log for all models (instead of a log line per model)
+Logger.info('Models loaded', {
+  models: Object.keys(db).map((modelName) => ({
+    model: modelName,
+    associations: Object.keys(db[modelName].associations)
+  }))
 });
 
 db.sequelize = sequelize;

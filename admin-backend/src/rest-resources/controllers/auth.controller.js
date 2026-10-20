@@ -3,6 +3,8 @@ import config from '@configs/app.config.js';
 import { sendResponse } from '@src/helpers/response.helpers.js';
 import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
+import { emitEvent } from '@src/events/event.bus.js';
+import { EVENTS } from '@src/events/event.types.js';
 import {
   AdminLoginHandler,
   RefreshAdminTokenHandler,
@@ -94,6 +96,12 @@ class AuthController {
    * Clears the auth cookies (stateless JWT — no server session to revoke).
    */
   static async logout(req, res, next) {
+    const admin = req.context?.admin;
+    emitEvent(EVENTS.AUTH_LOGOUT, {
+      actorId: admin?.id ?? null,
+      actorType: admin ? 'admin_user' : null,
+      actorEmail: admin?.email ?? null
+    }, req.context);
     clearAuthCookies(res);
     sendResponse({ req, res, next }, {}, 'Logged out successfully');
   }

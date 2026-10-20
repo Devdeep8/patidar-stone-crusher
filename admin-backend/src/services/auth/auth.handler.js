@@ -5,6 +5,8 @@ import config from '@configs/app.config.js';
 import { BaseHandler } from '@src/libs/base.handler.js';
 import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
+import { emitEvent } from '@src/events/event.bus.js';
+import { EVENTS } from '@src/events/event.types.js';
 
 const signAccessToken = (admin) => jwt.sign(
   { sub: admin.id, email: admin.email, role: admin.role, type: 'access' },
@@ -37,10 +39,12 @@ export class AdminLoginHandler extends BaseHandler {
 
     // Same error for unknown email and wrong password to prevent user enumeration
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
+      emitEvent(EVENTS.AUTH_LOGIN_FAILED, { actorId: null, actorType: 'admin_user', actorEmail: email }, this.context);
       throw new AppError(Errors.INVALID_CREDENTIALS, { traceId: this.traceId });
     }
 
     if (!admin.isActive) {
+      emitEvent(EVENTS.AUTH_LOGIN_FAILED, { actorId: admin.id, actorType: 'admin_user', actorEmail: admin.email }, this.context);
       throw new AppError(Errors.FORBIDDEN, {
         traceId: this.traceId,
         message: 'This admin account has been deactivated'
@@ -49,6 +53,8 @@ export class AdminLoginHandler extends BaseHandler {
 
     admin.lastLoginAt = new Date();
     await admin.save({ fields: ['lastLoginAt'] });
+
+    emitEvent(EVENTS.AUTH_LOGIN_SUCCEEDED, { actorId: admin.id, actorType: 'admin_user', actorEmail: admin.email }, this.context);
 
     return {
       admin: admin.toJSON(), // password hash stripped by the model's toJSON

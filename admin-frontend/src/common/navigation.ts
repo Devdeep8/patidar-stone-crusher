@@ -5,7 +5,10 @@
 import {
   IconArticle,
   IconLayoutDashboard,
-  IconNotes
+  IconNotes,
+  IconShieldLock,
+  IconUser,
+  IconUsers
 } from "@tabler/icons-react";
 import type { Permission } from "./permissions";
 
@@ -41,6 +44,32 @@ export const NAV_SECTIONS: NavSection[] = [
         url: "/cms/blogs",
         icon: IconArticle,
         permission: "cms.blogs.view"
+      }
+    ]
+  },
+  {
+    title: "System",
+    url: "/system",
+    icon: IconShieldLock,
+    permission: "audit.view",
+    items: [
+      {
+        title: "Audit Logs",
+        url: "/system/audit-logs",
+        icon: IconNotes,
+        permission: "audit.view"
+      },
+      {
+        title: "Users",
+        url: "/system/users",
+        icon: IconUsers,
+        permission: "users.view"
+      },
+      {
+        title: "App Users",
+        url: "/system/app-users",
+        icon: IconUser,
+        permission: "users.view"
       }
     ]
   }

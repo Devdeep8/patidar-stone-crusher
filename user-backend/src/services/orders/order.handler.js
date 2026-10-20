@@ -3,6 +3,15 @@ import db from '@src/db/models/index.js';
 import { BaseHandler } from '@src/libs/base.handler.js';
 import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
+import { emitEvent } from '@src/events/event.bus.js';
+import { EVENTS } from '@src/events/event.types.js';
+
+// Audit snapshot of the acting user (orders are a user-backend write path)
+const auditActor = (context) => ({
+  actorId: context?.userId ?? null,
+  actorType: context?.user ? 'user' : 'system',
+  actorEmail: context?.user?.email ?? null
+});
 
 const { Order, Customer, Sequelize } = db;
 
@@ -206,6 +215,13 @@ export class CreateOrderHandler extends BaseHandler {
       }
     }
 
+    emitEvent(EVENTS.ENTITY_CREATED, {
+      ...auditActor(this.context),
+      entity: 'order',
+      entityId: order.id,
+      after: order.toJSON()
+    }, this.context);
+
     // Reload with the customer joined so the response matches the list shape
     return findOrderWithCustomer(order.id, t);
   }
@@ -256,6 +272,9 @@ export class UpdateOrderReceivedHandler extends BaseHandler {
       throw new AppError(Errors.NOT_FOUND, { traceId: this.traceId, message: 'Order not found' });
     }
 
+    // Snapshot the pre-update state for the audit diff
+    const previousOrder = order.toJSON();
+
     if (Number(amountReceived) > Number(order.total_amount)) {
       throw new AppError(Errors.INVALID_INPUT, {
         traceId: this.traceId,
@@ -265,6 +284,15 @@ export class UpdateOrderReceivedHandler extends BaseHandler {
 
     order.amount_received = amountReceived;
     await order.save({ fields: ['amount_received'], transaction: t });
+
+    emitEvent(EVENTS.ENTITY_UPDATED, {
+      ...auditActor(this.context),
+      entity: 'order',
+      entityId: id,
+      before: previousOrder,
+      after: order.toJSON()
+    }, this.context);
+
     await order.reload({
       include: [{ model: Customer, as: 'customer' }],
       transaction: t

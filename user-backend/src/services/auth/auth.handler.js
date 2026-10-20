@@ -5,6 +5,8 @@ import config from '@configs/app.config.js';
 import { BaseHandler } from '@src/libs/base.handler.js';
 import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
+import { emitEvent } from '@src/events/event.bus.js';
+import { EVENTS } from '@src/events/event.types.js';
 
 const signAccessToken = (user) => jwt.sign(
   { sub: user.id, email: user.email, type: 'access' },
@@ -37,10 +39,12 @@ export class UserLoginHandler extends BaseHandler {
 
     // Same error for unknown email and wrong password to prevent user enumeration
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
+      emitEvent(EVENTS.AUTH_LOGIN_FAILED, { actorId: null, actorType: 'user', actorEmail: email }, this.context);
       throw new AppError(Errors.INVALID_CREDENTIALS, { traceId: this.traceId });
     }
 
     if (!user.isActive) {
+      emitEvent(EVENTS.AUTH_LOGIN_FAILED, { actorId: user.id, actorType: 'user', actorEmail: user.email }, this.context);
       throw new AppError(Errors.FORBIDDEN, {
         traceId: this.traceId,
         message: 'This account has been deactivated'
@@ -49,6 +53,8 @@ export class UserLoginHandler extends BaseHandler {
 
     user.lastLoginAt = new Date();
     await user.save({ fields: ['lastLoginAt'] });
+
+    emitEvent(EVENTS.AUTH_LOGIN_SUCCEEDED, { actorId: user.id, actorType: 'user', actorEmail: user.email }, this.context);
 
     return {
       user: user.toJSON(), // password hash stripped by the model's toJSON

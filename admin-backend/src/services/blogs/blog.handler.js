@@ -3,6 +3,15 @@ import { Op } from 'sequelize';
 import { BaseHandler } from '@src/libs/base.handler.js';
 import { AppError } from '@src/errors/app.error.js';
 import { cloudinaryService } from '@src/utils/cloudinary.service.js';
+import { emitEvent } from '@src/events/event.bus.js';
+import { EVENTS } from '@src/events/event.types.js';
+
+// Audit snapshot of the acting admin for entity lifecycle events
+const auditActor = (context) => ({
+  actorId: context?.adminId ?? null,
+  actorType: context?.admin ? 'admin_user' : null,
+  actorEmail: context?.admin?.email ?? null
+});
 
 const BLOG_AUTHOR_ATTRIBUTES = ['id', 'name', 'email', 'role'];
 
@@ -167,6 +176,13 @@ export class CreateBlogHandler extends BaseHandler {
       status: blog.status
     });
 
+    emitEvent(EVENTS.ENTITY_CREATED, {
+      ...auditActor(this.context),
+      entity: 'blog',
+      entityId: blog.id,
+      after: blog.toJSON()
+    }, this.context);
+
     return Blog.findByPk(blog.id, {
       include: [{
         model: AdminUser,
@@ -191,6 +207,9 @@ export class UpdateBlogHandler extends BaseHandler {
     if (!blog) {
       throw AppError.notFound('Blog not found', { meta: { resourceId: id } });
     }
+
+    // Snapshot the pre-update state for the audit diff
+    const previousBlog = blog.toJSON();
 
     // Snapshot the current images so we can clean up replaced ones after the update
     const previousImages = Array.isArray(blog.images) ? [...blog.images] : [];
@@ -232,6 +251,14 @@ export class UpdateBlogHandler extends BaseHandler {
       fields: Object.keys(patch)
     });
 
+    emitEvent(EVENTS.ENTITY_UPDATED, {
+      ...auditActor(this.context),
+      entity: 'blog',
+      entityId: id,
+      before: previousBlog,
+      after: blog.toJSON()
+    }, this.context);
+
     // Images were replaced -> delete the removed ones from Cloudinary.
     // Runs after the DB update and never throws (cleanup must not fail the update).
     if (updates.images !== undefined) {
@@ -261,20 +288,25 @@ export class DeleteBlogHandler extends BaseHandler {
     const { Blog } = this.context.models;
     const { id } = this.args;
 
-    // Soft delete (paranoid model)
-    const deletedCount = await Blog.destroy({
-      where: { id },
-      transaction: this.dbTransaction
-    });
-
-    if (deletedCount === 0) {
+    const blog = await Blog.findByPk(id, { transaction: this.dbTransaction });
+    if (!blog) {
       throw AppError.notFound('Blog not found', { meta: { resourceId: id } });
     }
+
+    // Soft delete (paranoid model)
+    await blog.destroy({ transaction: this.dbTransaction });
 
     this.logger.info('Blog soft-deleted', {
       category: 'business',
       blogId: id
     });
+
+    emitEvent(EVENTS.ENTITY_DELETED, {
+      ...auditActor(this.context),
+      entity: 'blog',
+      entityId: id,
+      before: blog.toJSON()
+    }, this.context);
 
     return { id, deleted: true };
   }

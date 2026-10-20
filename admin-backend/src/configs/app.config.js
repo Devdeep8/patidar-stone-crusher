@@ -161,6 +161,21 @@ const config = convict({
     }
   },
 
+  audit: {
+    enabled: {
+      doc: 'Master switch for audit event enqueueing',
+      format: Boolean,
+      default: true,
+      env: 'AUDIT_LOG_ENABLED'
+    },
+    queueName: {
+      doc: 'BullMQ queue name for audit log events',
+      format: String,
+      default: 'audit-logs',
+      env: 'AUDIT_QUEUE_NAME'
+    }
+  },
+
   redis: {
     host: {
       doc: 'Redis host',

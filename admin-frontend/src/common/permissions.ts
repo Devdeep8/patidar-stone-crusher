@@ -7,6 +7,8 @@ export const PERMISSIONS = [
   "dashboard.view",
   "cms.view",
   "cms.blogs.view",
+  "audit.view",
+  "users.view",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -15,6 +17,8 @@ export const PERMISSION_ROLES: Record<Permission, readonly AdminRole[]> = {
   "dashboard.view": ["admin", "editor"],
   "cms.view": ["admin", "editor"],
   "cms.blogs.view": ["admin", "editor"],
+  "audit.view": ["admin"],
+  "users.view": ["admin"],
 };
 
 export const hasPermission = (

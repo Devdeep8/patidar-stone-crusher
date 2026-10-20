@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import config from "@configs/app.config.js";
 import app from "@src/rest-resources/index.js";
+import "@src/events/index.js";
 import { Logger } from "@src/utils/logger.js";
 import db from "@src/db/models/index.js";
 import { redisClient } from "@src/libs/redis.js";
