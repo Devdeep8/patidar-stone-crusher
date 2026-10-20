@@ -36,7 +36,7 @@ npm run dev                 # http://localhost:3000
 
 - DB: `patidar-stone-crusher-website-db` (postgres/postgres), Redis empty password.
 - Frontend hits `NEXT_PUBLIC_API_URL=http://localhost:3004` ([.env](user-frontend/.env)).
-- **Demo login** (hint shown on the login screen): `staff@crusher.com` / `Staff@123` — seeded idempotently with `npm run db:seed` (in `user-backend/`).
+- **Demo login** (hint shown on the login screen): `staff@crusher.com` / `Staff@123` — the idempotent seeder is owned by `admin-backend`; do not use demo credentials in production.
 
 ---
 
@@ -93,12 +93,10 @@ route → contextMiddleware(bool) → isUserAuthenticated() → requestValidatio
 
 ### Schema changes — migrations only
 
-The Postgres DB (`patidar-stone-crusher-website-db`) is **shared with admin-backend**, which owns the earlier migrations (`create-users`, `create-customers-and-orders`, …) in its own `src/db/migrations`. user-backend now carries its own migration + seeder under `src/db/`:
+The Postgres DB (`patidar-stone-crusher-website-db`) is **shared with admin-backend**. All schema migrations and seeders are owned and run by `admin-backend`; user-backend retains the Sequelize models it needs at runtime and has no migration/seeding CLI or database role with schema privileges.
 
-- `npm run db:migrate` / `db:migrate:undo` — sequelize-cli (config in [database.cli.cjs](user-backend/src/configs/database.cli.cjs), auto-maps docker hosts for host runs)
-- `npm run db:migration:create` — scaffolds a timestamped migration (mirror of the admin helper)
-- `npm run db:seed` — idempotent demo-user seeder (`staff@crusher.com` / `Staff@123`)
-- [20260920101609-add-order-bahi-khata-fields.cjs](user-backend/src/db/migrations/20260920101609-add-order-bahi-khata-fields.cjs) — the Phase-1 columns + repairs a duplicate `order_no` index and restores `ON DELETE RESTRICT` on the customer FK
+- Run `npm run db:migrate` and, only in non-production environments, `npm run db:seed` from `admin-backend/`.
+- The Phase-1 order schema migration is [20260920101609-add-order-bahi-khata-fields.cjs](admin-backend/src/db/migrations/20260920101609-add-order-bahi-khata-fields.cjs).
 
 **Never** change schema with `sequelize.sync({ alter: true })` — it created a duplicate unique index and flipped the FK to SET NULL when tried once. Migrations are the only path.
 
@@ -192,7 +190,7 @@ Stone/orange palette on `bg-stone-100`, 2px borders, rounded-xl cards, oversized
 **Done and working (user side)**
 - Full auth loop (login → cookies → /me hydration → silent refresh → logout) with rate limiting and enumeration safety.
 - Orders CRUD-lite (create / list-by-month / detail / update received) with transactional customer find-or-create and human order numbers.
-- **Phase 1 bahi-khata capture** (2026-09-20): village/material/grade/trolleys/rate/payment-mode/note on orders, computed `total = quantity × rate` with manual override, `last_order` prefill on lookup, dashboard + detail surfacing, full hi/en i18n. Migrated via [20260920101609-add-order-bahi-khata-fields.cjs](user-backend/src/db/migrations/20260920101609-add-order-bahi-khata-fields.cjs) + demo-user seeder.
+- **Phase 1 bahi-khata capture** (2026-09-20): village/material/grade/trolleys/rate/payment-mode/note on orders, computed `total = quantity × rate` with manual override, `last_order` prefill on lookup, dashboard + detail surfacing, full hi/en i18n. Schema changes are migrated and seeded from `admin-backend/`.
 - Customer lookup autofill powering the order form.
 - **Customer-wise khata** (2026-09-20): paginated customer index with all-time order stats + search (name/phone), and per-customer order-history pages — all paginated server-side.
 - Bilingual operator UI: dashboard, new order, order detail, customers, customer orders.

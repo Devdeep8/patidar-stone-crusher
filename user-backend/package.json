@@ -7,11 +7,7 @@
   "scripts": {
     "dev": "tsx index.js",
     "dev:nodemon": "nodemon --watch . --ext js,mjs,cjs,json,ts,tsx --ignore node_modules --ignore .git --exec tsx index.js",
-    "start": "node index.js",
-    "db:migration:create": "node scripts/create-migration.js",
-    "db:migrate": "sequelize-cli db:migrate",
-    "db:migrate:undo": "sequelize-cli db:migrate:undo",
-    "db:seed": "sequelize-cli db:seed:all"
+    "start": "tsx index.js"
   },
   "dependencies": {
     "ajv": "^8.20.0",
@@ -49,7 +45,6 @@
     "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0",
-    "sequelize-cli": "^6.6.5"
+    "nodemon": "^3.1.0"
   }
 }
