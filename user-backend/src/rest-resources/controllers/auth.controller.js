@@ -22,11 +22,14 @@ const expiryToMaxAge = (expiry) => {
   return parseInt(match[1], 10) * units[match[2]];
 };
 
-// httpOnly cookies so browsers keep the tokens out of client-side JS
+// httpOnly cookies so browsers keep the tokens out of client-side JS.
+// In production the frontend (Vercel) and backend (VPS) are cross-site,
+// so browsers only accept the cookie with SameSite=None + Secure over HTTPS.
+const isProd = config.get('env') === 'production';
 const cookieBaseOptions = () => ({
   httpOnly: true,
-  secure: config.get('env') === 'production',
-  sameSite: 'lax',
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
   path: '/'
 });
 
@@ -43,7 +46,7 @@ const setAuthCookies = (res, { accessToken, refreshToken }) => {
 
 const clearAuthCookies = (res) => {
   Object.values(AUTH_COOKIES).forEach((name) => {
-    res.clearCookie(name, { path: '/' });
+    res.clearCookie(name, cookieBaseOptions());
   });
 };
 
