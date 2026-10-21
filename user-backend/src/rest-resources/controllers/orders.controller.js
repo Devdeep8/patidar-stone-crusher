@@ -6,7 +6,7 @@ import {
   GetOrderHandler,
   UpdateOrderReceivedHandler
 } from '@src/services/orders/order.handler.js';
-import { todayUTC } from '@src/helpers/time.helpers.js';
+import { todayInBusinessTimeZone } from '@src/helpers/time.helpers.js';
 
 class OrdersController {
   /** POST /api/v1/orders — find-or-create customer, then create the order */
@@ -17,7 +17,10 @@ class OrdersController {
 
   /** GET /api/v1/orders?date=YYYY-MM-DD — one day of orders for the dashboard */
   static async listOrders(req, res, next) {
-    const result = await ListOrdersHandler.execute({ date: req.query.date ?? todayUTC() }, req.context);
+    const result = await ListOrdersHandler.execute(
+      { date: req.query.date ?? todayInBusinessTimeZone() },
+      req.context
+    );
     sendResponse({ req, res, next }, result, 'Orders retrieved successfully');
   }
 

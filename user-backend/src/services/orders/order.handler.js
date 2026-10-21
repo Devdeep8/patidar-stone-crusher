@@ -5,7 +5,11 @@ import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
 import { emitEvent } from '@src/events/event.bus.js';
 import { EVENTS } from '@src/events/event.types.js';
-import { dayRangeUTC, isValidDateString, todayUTC } from '@src/helpers/time.helpers.js';
+import {
+  dayRangeInBusinessTimeZone,
+  isValidDateString,
+  todayInBusinessTimeZone
+} from '@src/helpers/time.helpers.js';
 
 // Audit snapshot of the acting user (orders are a user-backend write path)
 const auditActor = (context) => ({
@@ -242,13 +246,13 @@ export class ListOrdersHandler extends BaseHandler {
       });
     }
     // Orders cannot exist in the future — block browsing beyond today
-    if (date > todayUTC()) {
+    if (date > todayInBusinessTimeZone()) {
       throw new AppError(Errors.INVALID_INPUT, {
         traceId: this.traceId,
         message: 'date cannot be in the future'
       });
     }
-    const { start, end } = dayRangeUTC(date);
+    const { start, end } = dayRangeInBusinessTimeZone(date);
 
     return Order.findAll({
       where: {

@@ -87,7 +87,7 @@ route → contextMiddleware(bool) → isUserAuthenticated() → requestValidatio
 
 - **`users`** — UUID pk, name, unique email, bcrypt password, `isActive`, `lastLoginAt`.
 - **`customers`** — UUID pk, **unique 10-digit phone** (validated `^[0-9]{10}$`), name, `preferred_language` enum `hi|en` default `hi`.
-- **`orders`** — UUID pk, unique human `order_no` (starts **1001**), `customer_id` FK (RESTRICT on delete), `total_amount` / `amount_received` DECIMAL(12,2), instance-level guard `received ≤ total`, plus the Phase-1 **bahi-khata fields** (all nullable — requiredness enforced in the handler): `village` STRING(100), `material` ENUM(`ret`/`gitti`/`both`), `grade` STRING(50) free text, `quantity` INTEGER (trolleys), `rate` DECIMAL(12,2) (₹/trolley), `payment_type` ENUM(`nagad`/`udhaar`/`online`) — informational only, never affects derived status — and `note` STRING(500).
+- **`orders`** — UUID pk, unique human `order_no` (starts **1010** for new orders; existing lower numbers are preserved), `customer_id` FK (RESTRICT on delete), `total_amount` / `amount_received` DECIMAL(12,2), instance-level guard `received ≤ total`, plus the Phase-1 **bahi-khata fields** (all nullable — requiredness enforced in the handler): `village` STRING(100), `material` ENUM(`ret`/`gitti`/`both`), `grade` STRING(50) free text, `quantity` INTEGER (trolleys), `rate` DECIMAL(12,2) (₹/trolley), `payment_type` ENUM(`nagad`/`udhaar`/`online`) — informational only, never affects derived status — and `note` STRING(500).
   - [order.model.js](user-backend/src/db/models/order.model.js) owns `computeOrderStatus()` and a custom `toJSON()` that emits the API contract: snake_case keys, numbers (not pg strings), the **derived `status`**, and null-safe bahi-khata fields (pre-Phase-1 orders render with nulls).
 - Also loaded: `sessions` (User hasMany), `adminUsers`, `blogs`, `packages` — scaffolded for later.
 
@@ -106,7 +106,7 @@ The Postgres DB (`patidar-stone-crusher-website-db`) is **shared with admin-back
 2. **Total**: an explicit `total_amount` wins; otherwise it is computed as `quantity × rate` (missing both → 400).
 3. `amount_received ≤ total_amount` check.
 4. Find-or-create customer by phone — a **different name for a known phone is silently ignored** (the form locks the field anyway).
-5. `order_no = max(order_no) + 1`, retried up to 3× on unique-collision from concurrent creates.
+5. `order_no = max(max(order_no), 1009) + 1`, so new order numbers start at 1010 while existing orders remain unchanged; retried up to 3× on unique-collision from concurrent creates.
 6. All inside the request transaction from `contextMiddleware(true)` — customer + order commit or roll back together.
 
 ### House conventions (established in this project — follow them)
