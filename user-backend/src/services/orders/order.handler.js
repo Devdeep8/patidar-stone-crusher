@@ -5,6 +5,7 @@ import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
 import { emitEvent } from '@src/events/event.bus.js';
 import { EVENTS } from '@src/events/event.types.js';
+import { dayRangeUTC, isValidDateString, todayUTC } from '@src/helpers/time.helpers.js';
 
 // Audit snapshot of the acting user (orders are a user-backend write path)
 const auditActor = (context) => ({
@@ -15,8 +16,8 @@ const auditActor = (context) => ({
 
 const { Order, Customer, Sequelize } = db;
 
-// Human-readable order numbers start here (order_no = max + 1)
-const FIRST_ORDER_NO = 1001;
+// Human-readable order numbers start here; existing lower numbers are preserved.
+const FIRST_ORDER_NO = 1010;
 const ORDER_NO_RETRIES = 3; // guards the max+1 sequence against concurrent creates
 const PHONE_PATTERN = /^[0-9]{10}$/; // Indian mobile numbers, no country code
 
@@ -190,7 +191,7 @@ export class CreateOrderHandler extends BaseHandler {
     let order;
     for (let attempt = 0; attempt < ORDER_NO_RETRIES; attempt++) {
       const maxNo = await Order.max('order_no', { transaction: t });
-      const nextNo = (maxNo || FIRST_ORDER_NO - 1) + 1;
+      const nextNo = Math.max(maxNo ?? FIRST_ORDER_NO - 1, FIRST_ORDER_NO - 1) + 1;
       try {
         order = await Order.create(
           {
@@ -229,14 +230,25 @@ export class CreateOrderHandler extends BaseHandler {
 
 export class ListOrdersHandler extends BaseHandler {
   /**
-   * Orders created in the given calendar month (YYYY-MM), newest first,
-   * with the customer joined for the dashboard.
+   * Orders created on the given calendar day (YYYY-MM-DD, defaults to today),
+   * newest first, with the customer joined for the dashboard.
    */
   async run () {
-    const { month } = this.args;
-    const start = new Date(`${month}-01T00:00:00.000Z`);
-    const end = new Date(start);
-    end.setUTCMonth(end.getUTCMonth() + 1);
+    const { date } = this.args;
+    if (!isValidDateString(date)) {
+      throw new AppError(Errors.INVALID_INPUT, {
+        traceId: this.traceId,
+        message: 'date must be a valid YYYY-MM-DD'
+      });
+    }
+    // Orders cannot exist in the future — block browsing beyond today
+    if (date > todayUTC()) {
+      throw new AppError(Errors.INVALID_INPUT, {
+        traceId: this.traceId,
+        message: 'date cannot be in the future'
+      });
+    }
+    const { start, end } = dayRangeUTC(date);
 
     return Order.findAll({
       where: {

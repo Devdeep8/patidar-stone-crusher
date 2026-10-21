@@ -48,8 +48,8 @@ export interface CreateOrderPayload {
 }
 
 export const ordersService = {
-  /** GET /api/v1/orders?month=YYYY-MM — one month of orders (joined with customer) */
-  listByMonth: (month: string) => apiRequest<Order[]>(`/api/v1/orders?month=${month}`),
+  /** GET /api/v1/orders?date=YYYY-MM-DD — one day of orders (joined with customer) */
+  listByDay: (date: string) => apiRequest<Order[]>(`/api/v1/orders?date=${date}`),
 
   /** GET /api/v1/orders/:id */
   getById: (id: string) => apiRequest<Order>(`/api/v1/orders/${id}`),

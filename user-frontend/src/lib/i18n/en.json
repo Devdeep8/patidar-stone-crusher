@@ -29,11 +29,12 @@
     "totalAmount": "Total Amount",
     "totalReceived": "Received",
     "totalPending": "Pending",
-    "noOrders": "No orders this month.",
+    "noOrders": "No orders this day.",
     "noOrdersHint": "Tap \"New Order\" to add the first one.",
     "loadFailed": "Could not load orders.",
     "orderNo": "Order",
-    "balance": "Balance"
+    "balance": "Balance",
+    "today": "Today"
   },
   "orderForm": {
     "title": "New Order",

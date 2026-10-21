@@ -28,8 +28,8 @@ router.post(
 );
 
 /**
- * @route   GET /api/v1/orders?month=YYYY-MM
- * @desc    List a month's orders with customer name/phone joined
+ * @route   GET /api/v1/orders?date=YYYY-MM-DD
+ * @desc    List a day's orders with customer name/phone joined
  * @access  Private (read — no transaction)
  */
 router.get(

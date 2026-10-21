@@ -40,3 +40,30 @@ export function shiftMonth(month: string, delta: number): string {
   const date = new Date(year, mon - 1 + delta, 1);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
+
+/** Current day as "YYYY-MM-DD" (local time). */
+export function currentDay(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+    now.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+/** Shift a "YYYY-MM-DD" day by the given number of days. */
+export function shiftDay(day: string, delta: number): string {
+  const [year, mon, date] = day.split("-").map(Number);
+  const shifted = new Date(year, mon - 1, date + delta);
+  return `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, "0")}-${String(
+    shifted.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+/** "2026-09-12" -> "12 सितंबर 2026" / "12 September 2026" */
+export function fullDayLabel(day: string, lang: Language): string {
+  const [year, mon, date] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(year, mon - 1, date));
+}

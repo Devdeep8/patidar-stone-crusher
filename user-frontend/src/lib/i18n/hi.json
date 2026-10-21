@@ -29,11 +29,12 @@
     "totalAmount": "कुल रकम",
     "totalReceived": "मिला हुआ",
     "totalPending": "बाकी",
-    "noOrders": "इस महीने कोई ऑर्डर नहीं।",
+    "noOrders": "इस दिन कोई ऑर्डर नहीं।",
     "noOrdersHint": "पहला ऑर्डर जोड़ने के लिए \"नया ऑर्डर\" दबाएँ।",
     "loadFailed": "ऑर्डर लोड नहीं हो सके।",
     "orderNo": "ऑर्डर",
-    "balance": "बाकी"
+    "balance": "बाकी",
+    "today": "आज"
   },
   "orderForm": {
     "title": "नया ऑर्डर",

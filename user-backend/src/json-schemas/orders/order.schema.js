@@ -2,7 +2,7 @@
 // Structural input hygiene only — business rules like the strict 10-digit
 // phone live in the service handlers (order.handler.js / customer.handler.js).
 
-const MONTH_PATTERN = '^\\d{4}-(0[1-9]|1[0-2])$'; // YYYY-MM
+const DATE_PATTERN = '^\\d{4}-\\d{2}-\\d{2}$'; // YYYY-MM-DD (shape only; validity checked in handler)
 
 export const createOrderSchema = {
   bodySchema: {
@@ -29,9 +29,9 @@ export const createOrderSchema = {
 export const listOrdersSchema = {
   querySchema: {
     type: 'object',
-    required: ['month'],
+    // Optional — the controller defaults it to today (UTC)
     properties: {
-      month: { type: 'string', pattern: MONTH_PATTERN }
+      date: { type: 'string', pattern: DATE_PATTERN }
     }
   }
 };

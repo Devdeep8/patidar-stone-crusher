@@ -1,30 +1,30 @@
 "use client";
 
 // src/views/DashboardView.tsx
-// Monthly order book: month stepper, big summary numbers, tappable order list.
+// Daily order book: day stepper, big summary numbers, tappable order list.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { CalendarClock, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { StatusBadge } from "@/components/StatusBadge";
-import { currentMonth, formatINR, monthLabel, shiftMonth } from "@/lib/format";
+import { currentDay, formatINR, fullDayLabel, shiftDay } from "@/lib/format";
 import { ordersService, type Order } from "@/services/orders.service";
 
 export function DashboardView() {
   const { t, lang } = useLanguage();
   const router = useRouter();
 
-  const [month, setMonth] = useState(currentMonth);
+  const [day, setDay] = useState(currentDay);
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
-  const load = useCallback(async (targetMonth: string) => {
+  const load = useCallback(async (targetDay: string) => {
     setLoading(true);
     setFailed(false);
     try {
-      setOrders(await ordersService.listByMonth(targetMonth));
+      setOrders(await ordersService.listByDay(targetDay));
     } catch {
       setOrders(null);
       setFailed(true);
@@ -33,9 +33,11 @@ export function DashboardView() {
     }
   }, []);
 
+  const isToday = day === currentDay();
+
   useEffect(() => {
-    load(month);
-  }, [month, load]);
+    load(day);
+  }, [day, load]);
 
   const summary = useMemo(() => {
     const list = orders ?? [];
@@ -58,24 +60,35 @@ export function DashboardView() {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pb-16">
-      {/* Month stepper — simple arrows, no calendar picker */}
+      {/* Day stepper — arrows plus a "today" shortcut */}
       <div className="mt-4 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setMonth((m) => shiftMonth(m, -1))}
-          aria-label="Previous month"
-          className="flex size-14 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100"
+          onClick={() => setDay((d) => shiftDay(d, -1))}
+          aria-label="Previous day"
+          className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100"
         >
           <ChevronLeft className="size-8" />
         </button>
-        <div className="flex h-14 flex-1 items-center justify-center rounded-xl border-2 border-stone-200 bg-white text-xl font-extrabold text-stone-900">
-          {monthLabel(month, lang)}
+        <div className="flex h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 bg-white px-2 text-xl font-extrabold text-stone-900">
+          {fullDayLabel(day, lang)}
+          {!isToday && (
+            <button
+              type="button"
+              onClick={() => setDay(currentDay())}
+              className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg border-2 border-orange-600 px-2 text-base font-bold text-orange-700 hover:bg-orange-50 active:bg-orange-100"
+            >
+              <CalendarClock className="size-5" />
+              {t("dashboard.today")}
+            </button>
+          )}
         </div>
         <button
           type="button"
-          onClick={() => setMonth((m) => shiftMonth(m, 1))}
-          aria-label="Next month"
-          className="flex size-14 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100"
+          onClick={() => setDay((d) => shiftDay(d, 1))}
+          disabled={isToday}
+          aria-label="Next day"
+          className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100 disabled:cursor-not-allowed disabled:border-stone-200 disabled:text-stone-300 disabled:hover:bg-white"
         >
           <ChevronRight className="size-8" />
         </button>
@@ -111,7 +124,7 @@ export function DashboardView() {
             <p className="text-lg font-semibold text-stone-700">{t("dashboard.loadFailed")}</p>
             <button
               type="button"
-              onClick={() => load(month)}
+              onClick={() => load(day)}
               className="mt-4 min-h-12 rounded-xl border-2 border-orange-600 px-6 text-lg font-bold text-orange-700 hover:bg-orange-50"
             >
               {t("common.retry")}
