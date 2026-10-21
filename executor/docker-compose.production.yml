@@ -76,6 +76,14 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=executor_app-network"
+      - "traefik.http.routers.psc-user-api.rule=Host(`patidar-stone-cruhser-api.devdeep.dev`)"
+      - "traefik.http.routers.psc-user-api.entrypoints=https"
+      - "traefik.http.routers.psc-user-api.tls=true"
+      - "traefik.http.routers.psc-user-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.psc-user-api.loadbalancer.server.port=3004"
 
   admin-backend:
     build:
@@ -103,6 +111,14 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=executor_app-network"
+      - "traefik.http.routers.psc-admin-api.rule=Host(`admin-api-patidar-stone-cruhser.devdeep.dev`)"
+      - "traefik.http.routers.psc-admin-api.entrypoints=https"
+      - "traefik.http.routers.psc-admin-api.tls=true"
+      - "traefik.http.routers.psc-admin-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.psc-admin-api.loadbalancer.server.port=3006"
 
   # Same admin-backend image; boots ALL queue consumers from the registry
   admin-backend-worker:
