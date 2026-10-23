@@ -19,7 +19,7 @@ export function LoginView() {
 
   // Already signed in (e.g. navigated back to /login) -> straight to orders
   useEffect(() => {
-    if (hydrated && authenticated) router.replace("/");
+    if (hydrated && authenticated) router.replace("/dashboard");
   }, [hydrated, authenticated, router]);
 
   async function handleSubmit(event: FormEvent) {
@@ -29,7 +29,7 @@ export function LoginView() {
     setSubmitting(true);
     try {
       await authStore.login({ email: email.trim(), password });
-      router.replace("/");
+      router.replace("/dashboard");
     } catch {
       setError(t("login.error"));
       setSubmitting(false);
@@ -97,8 +97,6 @@ export function LoginView() {
           >
             {submitting ? t("login.submitting") : t("login.submit")}
           </button>
-
-          <p className="mt-4 text-center text-sm text-stone-400">{t("login.demoHint")}</p>
         </form>
 
         <div className="mt-4 text-center">

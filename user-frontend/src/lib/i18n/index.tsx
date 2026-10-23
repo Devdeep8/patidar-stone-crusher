@@ -42,6 +42,27 @@ function lookup(lang: Language, key: string): string | undefined {
   return typeof node === "string" ? node : undefined;
 }
 
+// Some copy is a list (e.g. per-material uses) — translated as arrays,
+// with the same en fallback as translate().
+function lookupList(lang: Language, key: string): string[] | undefined {
+  const parts = key.split(".");
+  let node: unknown = DICTIONARIES[lang];
+  for (const part of parts) {
+    if (node && typeof node === "object" && part in (node as Record<string, unknown>)) {
+      node = (node as Record<string, unknown>)[part];
+    } else {
+      return undefined;
+    }
+  }
+  return Array.isArray(node) && node.every((v) => typeof v === "string")
+    ? (node as string[])
+    : undefined;
+}
+
+export function translateList(lang: Language, key: string): string[] {
+  return lookupList(lang, key) ?? lookupList("en", key) ?? [];
+}
+
 export function translate(lang: Language, key: string, vars?: Record<string, string | number>): string {
   const template = lookup(lang, key) ?? lookup("en", key) ?? key;
   if (!vars) return template;

@@ -211,7 +211,7 @@ export function NewOrderView() {
       setNote("");
       setStatus("unpaid");
       setAmountReceived("");
-      savedTimer.current = setTimeout(() => router.replace("/"), 1500);
+      savedTimer.current = setTimeout(() => router.replace("/dashboard"), 1500);
     } catch (error) {
       // Surface the specific, localized message when the backend rejects a
       // field (e.g. autofill/paste edge cases)
@@ -242,7 +242,7 @@ export function NewOrderView() {
     <main className="mx-auto w-full max-w-2xl px-4 pb-16">
       <div className="mt-4 flex items-center gap-3">
         <Link
-          href="/"
+          href="/dashboard"
           aria-label={t("common.back")}
           className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
         >

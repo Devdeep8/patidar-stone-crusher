@@ -15,8 +15,8 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-10 border-b-2 border-stone-200 bg-white">
       <div className="mx-auto flex min-h-16 max-w-3xl items-center gap-3 px-4 py-2">
-        {/* Brand tap always returns to the monthly orders dashboard */}
-        <Link href="/" className="min-w-0 flex-1 rounded-xl focus-visible:outline-2">
+        {/* Brand tap always returns to the orders dashboard */}
+        <Link href="/dashboard" className="min-w-0 flex-1 rounded-xl focus-visible:outline-2">
           <p className="truncate text-lg font-bold text-stone-900">{t("common.appName")}</p>
           {user?.name ? <p className="truncate text-sm text-stone-500">{user.name}</p> : null}
         </Link>

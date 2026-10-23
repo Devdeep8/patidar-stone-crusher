@@ -39,6 +39,39 @@
   /* Font Families - Poppins as main font */
   --font-family-poppins: var(--font-poppins);
   --font-family-sans: var(--font-poppins);
+
+  /* ==========================================
+     PUBLIC SITE (Painted Board world) tokens
+     60/30/10: paper ground (60), ink fields +
+     type (30), ember action band (10); ochre
+     only as a secondary field accent.
+     ========================================== */
+  --color-paper: #f4ead9;        /* 60 — painted wall ground */
+  --color-ink: #171310;          /* 30 — wood-type ink */
+  --color-ember: #b3541e;        /* 10 — the CALL band */
+  --color-ochre: #e8a020;        /* secondary field accent */
+  --color-paper-warm: #eaddc4;   /* paper shade for bands */
+
+  --font-paint: var(--font-yatra), var(--font-mukta), sans-serif;
+  --font-poster: var(--font-anton), var(--font-yatra), sans-serif;
+  --font-site-body: var(--font-mukta), sans-serif;
+}
+
+/* Painted Board: print grain laid over the whole public site.
+   Data-URI SVG turbulence so no extra asset request. */
+.site-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Diagonal poster cut: a full-bleed band leaning off the frame */
+.poster-tilt {
+  transform: rotate(-2.5deg) scale(1.04);
 }
 
 /* ==========================================
