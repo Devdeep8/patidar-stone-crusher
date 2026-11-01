@@ -4,7 +4,6 @@
 // Simple order detail + payment editor: mark fully paid with one tap, or
 // enter an updated received amount. Status is recomputed by the server.
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, ChevronLeft, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
@@ -107,7 +106,8 @@ export function OrderDetailView() {
       value: order.payment_type ? t(`payment.${order.payment_type}`) : null
     },
     { label: t("orderDetail.note"), value: order.note },
-    { label: t("orderDetail.date"), value: dateLabel(order.created_at, lang) },
+    // Ledger day (order_date), not the creation timestamp
+    { label: t("orderDetail.date"), value: dateLabel(order.order_date ?? order.created_at, lang) },
     { label: t("orderDetail.total"), value: formatINR(order.total_amount) },
     { label: t("orderDetail.received"), value: formatINR(order.amount_received) },
     { label: t("orderDetail.balance"), value: formatINR(balance) },
@@ -116,13 +116,16 @@ export function OrderDetailView() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 pb-16">
       <div className="mt-4 flex items-center gap-3">
-        <Link
-          href="/dashboard"
+        {/* Back through history so the dashboard restores the browsed day
+            from its ?date= query instead of jumping to today */}
+        <button
+          type="button"
+          onClick={() => router.back()}
           aria-label={t("common.back")}
           className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
         >
           <ChevronLeft className="size-8" />
-        </Link>
+        </button>
         <h1 className="text-2xl font-extrabold text-stone-900">{t("orderDetail.title")}</h1>
       </div>
 

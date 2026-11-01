@@ -22,6 +22,13 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       unique: true
     },
+    order_date: {
+      // Business-local calendar day the order belongs to (YYYY-MM-DD) —
+      // the day-book key. Orders can be back-dated; created_at remains the
+      // true creation timestamp.
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
     customer_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -121,6 +128,7 @@ export default (sequelize, DataTypes) => {
     const json = {
       id: values.id,
       order_no: values.order_no,
+      order_date: values.order_date,
       customer_id: values.customerId ?? values.customer_id,
       total_amount: total,
       amount_received: received,

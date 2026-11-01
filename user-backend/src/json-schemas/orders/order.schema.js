@@ -21,7 +21,9 @@ export const createOrderSchema = {
       quantity: { type: 'integer' },
       rate: { type: 'number' },
       payment_type: { type: 'string', maxLength: 10 },
-      note: { type: 'string', maxLength: 500 }
+      note: { type: 'string', maxLength: 500 },
+      // Optional — the handler defaults it to today (business timezone)
+      date: { type: 'string', pattern: DATE_PATTERN }
     }
   }
 };

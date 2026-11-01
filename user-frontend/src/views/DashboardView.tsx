@@ -2,6 +2,8 @@
 
 // src/views/DashboardView.tsx
 // Daily order book: day stepper, big summary numbers, tappable order list.
+// The selected day lives in the URL (?date=YYYY-MM-DD) so returning from an
+// order's detail page (browser back) restores the day the user was viewing.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,13 +12,29 @@ import { useLanguage } from "@/lib/i18n";
 import { StatusBadge } from "@/components/StatusBadge";
 import { currentDay, formatINR, fullDayLabel, shiftDay } from "@/lib/format";
 import { ordersService, type Order } from "@/services/orders.service";
+import { expensesService, type DayExpenses } from "@/services/expenses.service";
 
 export function DashboardView() {
   const { t, lang } = useLanguage();
   const router = useRouter();
 
-  const [day, setDay] = useState(currentDay);
+  // Restore the browsed day from the URL when returning via back/forward —
+  // without this the view remounts on today and the user loses their place.
+  const dayFromUrl = () => {
+    const date = new URLSearchParams(window.location.search).get("date") ?? "";
+    return /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= currentDay() ? date : currentDay();
+  };
+
+  const [day, setDayState] = useState(dayFromUrl);
+
+  // Keep the URL in sync (replace — stepper taps are not history entries)
+  const setDay = (next: string) => {
+    setDayState(next);
+    router.replace(next === currentDay() ? "/dashboard" : `/dashboard?date=${next}`, { scroll: false });
+  };
+
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [expenses, setExpenses] = useState<DayExpenses | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
@@ -24,7 +42,15 @@ export function DashboardView() {
     setLoading(true);
     setFailed(false);
     try {
-      setOrders(await ordersService.listByDay(targetDay));
+      // Both calls together — the expense total is part of the day's ledger;
+      // an expense-list failure must not blank the orders.
+      const [ordersResult, expensesResult] = await Promise.allSettled([
+        ordersService.listByDay(targetDay),
+        expensesService.listByDay(targetDay)
+      ]);
+      if (ordersResult.status === "rejected") throw ordersResult.reason;
+      setOrders(ordersResult.value);
+      setExpenses(expensesResult.status === "fulfilled" ? expensesResult.value : null);
     } catch {
       setOrders(null);
       setFailed(true);
@@ -43,13 +69,17 @@ export function DashboardView() {
     const list = orders ?? [];
     const totalAmount = list.reduce((sum, order) => sum + order.total_amount, 0);
     const totalReceived = list.reduce((sum, order) => sum + order.amount_received, 0);
+    // Real cash in hand for the operator: received minus the day's expenses.
+    // Pending (udhaar) money is NOT counted — it's not in hand yet.
+    const netIncome = totalReceived - (expenses?.total ?? 0);
     return {
       count: list.length,
       totalAmount,
       totalReceived,
       pending: Math.max(0, totalAmount - totalReceived),
+      netIncome,
     };
-  }, [orders]);
+  }, [orders, expenses]);
 
   const cards = [
     { label: t("dashboard.totalOrders"), value: String(summary.count), tone: "text-stone-900" },
@@ -64,7 +94,7 @@ export function DashboardView() {
       <div className="mt-4 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setDay((d) => shiftDay(d, -1))}
+          onClick={() => setDay(shiftDay(day, -1))}
           aria-label="Previous day"
           className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100"
         >
@@ -85,7 +115,7 @@ export function DashboardView() {
         </div>
         <button
           type="button"
-          onClick={() => setDay((d) => shiftDay(d, 1))}
+          onClick={() => setDay(shiftDay(day, 1))}
           disabled={isToday}
           aria-label="Next day"
           className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50 active:bg-stone-100 disabled:cursor-not-allowed disabled:border-stone-200 disabled:text-stone-300 disabled:hover:bg-white"
@@ -94,8 +124,9 @@ export function DashboardView() {
         </button>
       </div>
 
+      {/* Carry the browsed day so the form prefills it for back-dating */}
       <Link
-        href="/new"
+        href={!isToday ? `/new?date=${day}` : "/new"}
         className="mt-4 flex h-16 items-center justify-center rounded-xl bg-orange-600 text-2xl font-extrabold text-white hover:bg-orange-700 active:bg-orange-800"
       >
         {t("dashboard.newOrder")}
@@ -110,6 +141,44 @@ export function DashboardView() {
           </div>
         ))}
       </div>
+
+      {/* Net income — cash actually in hand: received − expenses. Pending
+          (udhaar) is excluded; it's not money in hand for the operator. */}
+      <div className="mt-3 rounded-xl border-2 border-stone-200 bg-white p-4">
+        <p className="text-base font-semibold text-stone-500">{t("dashboard.netIncome")}</p>
+        <p
+          className={`mt-1 text-4xl font-extrabold tracking-tight ${
+            summary.netIncome >= 0 ? "text-green-700" : "text-red-600"
+          }`}
+        >
+          {formatINR(summary.netIncome)}
+        </p>
+        <p className="mt-1 text-base font-semibold text-stone-500">
+          {t("dashboard.netIncomeBreakdown", {
+            received: formatINR(summary.totalReceived),
+            expense: formatINR(expenses?.total ?? 0),
+            pending: formatINR(summary.pending),
+          })}
+        </p>
+      </div>
+
+      {/* Day's expense total — one tap through to the expense page */}
+      <Link
+        href="/expenses"
+        className="mt-3 flex items-center justify-between rounded-xl border-2 border-stone-200 bg-white p-4 hover:border-orange-300 active:bg-orange-50"
+      >
+        <div>
+          <p className="text-base font-semibold text-stone-500">{t("dashboard.dayExpense")}</p>
+          <p className="mt-1 text-2xl font-extrabold text-stone-900">
+            {expenses ? formatINR(expenses.total) : "—"}
+          </p>
+        </div>
+        {isToday ? (
+          <span className="rounded-xl bg-orange-600 px-4 py-2 text-lg font-bold text-white">
+            {t("dashboard.addExpense")}
+          </span>
+        ) : null}
+      </Link>
 
       {/* Order list */}
       <div className="mt-6">

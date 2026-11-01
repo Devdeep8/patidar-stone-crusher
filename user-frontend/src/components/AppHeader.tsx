@@ -28,6 +28,13 @@ export function AppHeader() {
           {t("header.customers")}
         </Link>
 
+        <Link
+          href="/expenses"
+          className="flex min-h-12 shrink-0 items-center rounded-xl border-2 border-stone-300 px-4 text-lg font-bold text-stone-700 hover:bg-stone-100 active:bg-stone-200"
+        >
+          {t("header.expenses")}
+        </Link>
+
         <button
           type="button"
           onClick={() => setLang(lang === "hi" ? "en" : "hi")}

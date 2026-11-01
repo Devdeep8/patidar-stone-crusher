@@ -76,7 +76,11 @@ photography plan; the rest of the world stays photo-free.
 
 ### Not yet done
 
-- Real plant photos to replace the labeled stock and fill the slots.
+- Real plant photos to replace the labeled stock and fill the slots. The
+  owner's logo kit (2026-10-23) is integrated — primary lockup in the header,
+  reverse lockup in the footer, icon-only mark as the favicon
+  (`public/images/logo-*.png`, `src/app/icon.png`) — but it contained no plant
+  photography.
 - Browser-screenshot review is impossible in this harness (no browser tool);
   HTML smoke tests + clean detector pass stand in; first visual inspection
   is the user's.

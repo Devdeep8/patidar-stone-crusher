@@ -19,7 +19,8 @@
   },
   "header": {
     "logout": "लॉग आउट",
-    "customers": "ग्राहक"
+    "customers": "ग्राहक",
+    "expenses": "खर्च"
   },
   "dashboard": {
     "title": "ऑर्डर",
@@ -33,10 +34,41 @@
     "loadFailed": "ऑर्डर लोड नहीं हो सके।",
     "orderNo": "ऑर्डर",
     "balance": "बाकी",
-    "today": "आज"
+    "today": "आज",
+    "dayExpense": "आज का खर्च",
+    "addExpense": "+ खर्च जोड़ें",
+    "netIncome": "आज की कमाई (हाथ में)",
+    "netIncomeBreakdown": "मिला {received} − खर्च {expense} (बाकी उधार: {pending})"
+  },
+  "expenses": {
+    "title": "खर्च",
+    "addTitle": "खर्च जोड़ें",
+    "amount": "रकम (₹)",
+    "note": "नोट (वैकल्पिक)",
+    "notePlaceholder": "जैसे: 200 लीटर डीज़ल",
+    "save": "खर्च सेव करें",
+    "saving": "सेव हो रहा है…",
+    "dayTotal": "इस दिन का कुल खर्च",
+    "delete": "एंट्री हटाएँ",
+    "noExpenses": "इस दिन कोई खर्च नहीं।",
+    "noExpensesHint": "ऊपर कोई श्रेणी चुनकर पहला खर्च लिखें।",
+    "loadFailed": "खर्च लोड नहीं हुए।",
+    "errorAmount": "0 से बड़ी रकम डालें",
+    "errorSave": "खर्च सेव नहीं हुआ। फिर कोशिश करें।",
+    "errorDelete": "एंट्री हटी नहीं। फिर कोशिश करें।"
+  },
+  "expenseCategory": {
+    "diesel": "डीज़ल",
+    "operation": "ऑपरेशन",
+    "maintenance": "मरम्मत",
+    "wages": "मज़दूरी",
+    "other": "अन्य"
   },
   "orderForm": {
     "title": "नया ऑर्डर",
+    "date": "तारीख (वैकल्पिक)",
+    "dateToday": "आज",
+    "dateHint": "खाली छोड़ें तो आज की तारीख़ लगेगी — पुराना ऑर्डर लिखने के लिए तारीख़ चुनें",
     "phone": "ग्राहक का फ़ोन नंबर",
     "name": "ग्राहक का नाम",
     "existingCustomer": "पुराना ग्राहक",

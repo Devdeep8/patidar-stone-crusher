@@ -10,12 +10,13 @@
 // amount_received is derived from the chosen status — no free-form field
 // unless "Partially Paid" is picked.
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ChevronLeft } from "lucide-react";
+import { CheckCircle2, ChevronLeft, CalendarDays } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
-import { formatINR } from "@/lib/format";
+import { formatINR, currentDay, fullDayLabel } from "@/lib/format";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { customersService } from "@/services/customers.service";
 import {
   ordersService,
@@ -25,6 +26,17 @@ import {
 } from "@/services/orders.service";
 
 type FormStatus = "unpaid" | "partial" | "paid";
+
+// "YYYY-MM-DD" <-> Date for the calendar. Noon UTC keeps the calendar day
+// stable across timezones (17:30 IST, same date either way).
+const dayToDate = (day: string) => {
+  const [y, m, d] = day.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 12));
+};
+const dateToDay = (date: Date) => {
+  const shifted = new Date(date.getTime() + 12 * 60 * 60 * 1000); // back to UTC noon
+  return shifted.toISOString().slice(0, 10);
+};
 
 const PHONE_LENGTH = 10; // Indian mobile numbers
 
@@ -51,7 +63,7 @@ const PAYMENT_MODE_STYLES: Record<PaymentType, string> = {
 };
 
 export function NewOrderView() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const router = useRouter();
 
   const [phone, setPhone] = useState("");
@@ -73,6 +85,14 @@ export function NewOrderView() {
 
   const [status, setStatus] = useState<FormStatus>("unpaid");
   const [amountReceived, setAmountReceived] = useState("");
+
+  // Optional ledger day — empty means today; past days allowed (back-dating).
+  // Prefilled from ?date= when the form is opened from a past day's dashboard.
+  const [orderDate, setOrderDate] = useState(() => {
+    const date = new URLSearchParams(window.location.search).get("date") ?? "";
+    return /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= currentDay() ? date : "";
+  });
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -188,6 +208,7 @@ export function NewOrderView() {
     if (!totalOverride && rate !== "" && !Number.isNaN(rateNum)) payload.rate = rateNum;
     if (totalOverride && effectiveTotal) payload.total_amount = effectiveTotal;
     if (note.trim()) payload.note = note.trim();
+    if (orderDate) payload.date = orderDate;
 
     setSaving(true);
     try {
@@ -211,7 +232,12 @@ export function NewOrderView() {
       setNote("");
       setStatus("unpaid");
       setAmountReceived("");
-      savedTimer.current = setTimeout(() => router.replace("/dashboard"), 1500);
+      setOrderDate("");
+      // Return to the ledger day the order was recorded on
+      savedTimer.current = setTimeout(
+        () => router.replace(orderDate ? `/dashboard?date=${orderDate}` : "/dashboard"),
+        1500
+      );
     } catch (error) {
       // Surface the specific, localized message when the backend rejects a
       // field (e.g. autofill/paste edge cases)
@@ -241,13 +267,16 @@ export function NewOrderView() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 pb-16">
       <div className="mt-4 flex items-center gap-3">
-        <Link
-          href="/dashboard"
+        {/* Back through history so the dashboard (and the form, if reopened)
+            restores the browsed day from its ?date= query instead of today */}
+        <button
+          type="button"
+          onClick={() => router.back()}
           aria-label={t("common.back")}
           className="flex size-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
         >
           <ChevronLeft className="size-8" />
-        </Link>
+        </button>
         <h1 className="text-2xl font-extrabold text-stone-900">{t("orderForm.title")}</h1>
       </div>
 
@@ -262,6 +291,42 @@ export function NewOrderView() {
       ) : null}
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-5 rounded-2xl border-2 border-stone-200 bg-white p-5">
+        {/* 0. Ledger date — optional, defaults to today; for recording an
+            order that happened on an earlier day. shadcn Calendar in a
+            popover, showing the chosen day in Indian dd/mm/yy. */}
+        <div>
+          <span id="order-date-label" className="mb-1.5 block text-lg font-semibold text-stone-800">
+            {t("orderForm.date")}
+          </span>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger
+              aria-labelledby="order-date-label"
+              className="flex h-12 w-full items-center justify-between rounded-xl border-2 border-stone-300 bg-white px-4 text-lg font-bold text-stone-900 hover:bg-stone-50"
+            >
+              {orderDate ? fullDayLabel(orderDate, lang) : t("orderForm.dateToday")}
+              <CalendarDays className="size-6 text-orange-700" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={orderDate ? dayToDate(orderDate) : undefined}
+                defaultMonth={orderDate ? dayToDate(orderDate) : undefined}
+                // Future days are not selectable
+                disabled={{ after: dayToDate(currentDay()) }}
+                onSelect={(selected) => {
+                  if (selected) {
+                    setOrderDate(dateToDay(selected));
+                    setCalendarOpen(false);
+                  }
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+          {!orderDate ? (
+            <p className="mt-1.5 text-base font-semibold text-stone-500">{t("orderForm.dateHint")}</p>
+          ) : null}
+        </div>
+
         {/* 1. Phone — numeric keypad, drives the customer autofill */}
         <div>
           <label htmlFor="phone" className="mb-1.5 block text-lg font-semibold text-stone-800">

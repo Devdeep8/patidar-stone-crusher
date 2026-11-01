@@ -19,7 +19,8 @@
   },
   "header": {
     "logout": "Log Out",
-    "customers": "Customers"
+    "customers": "Customers",
+    "expenses": "Expenses"
   },
   "dashboard": {
     "title": "Orders",
@@ -33,10 +34,41 @@
     "loadFailed": "Could not load orders.",
     "orderNo": "Order",
     "balance": "Balance",
-    "today": "Today"
+    "today": "Today",
+    "dayExpense": "Day's Expense",
+    "addExpense": "+ Add Expense",
+    "netIncome": "Net Income (in hand)",
+    "netIncomeBreakdown": "Received {received} − Expense {expense} (pending udhaar: {pending})"
+  },
+  "expenses": {
+    "title": "Expenses",
+    "addTitle": "Add Expense",
+    "amount": "Amount (₹)",
+    "note": "Note (optional)",
+    "notePlaceholder": "e.g. 200L diesel for JCB",
+    "save": "Save Expense",
+    "saving": "Saving…",
+    "dayTotal": "Day's Total Expense",
+    "delete": "Delete entry",
+    "noExpenses": "No expenses this day.",
+    "noExpensesHint": "Tap a category above to record the first one.",
+    "loadFailed": "Could not load expenses.",
+    "errorAmount": "Enter an amount greater than 0",
+    "errorSave": "Could not save the expense. Please try again.",
+    "errorDelete": "Could not delete the entry. Please try again."
+  },
+  "expenseCategory": {
+    "diesel": "Diesel",
+    "operation": "Operation",
+    "maintenance": "Repair / Maintenance",
+    "wages": "Wages",
+    "other": "Other"
   },
   "orderForm": {
     "title": "New Order",
+    "date": "Order Date (optional)",
+    "dateToday": "Today",
+    "dateHint": "Leave empty for today — set a past date to record an old order",
     "phone": "Customer Phone Number",
     "name": "Customer Name",
     "existingCustomer": "Existing customer",

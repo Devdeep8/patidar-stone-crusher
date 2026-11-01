@@ -6,7 +6,6 @@ import Errors from '@src/errors/errorCodes.js';
 import { emitEvent } from '@src/events/event.bus.js';
 import { EVENTS } from '@src/events/event.types.js';
 import {
-  dayRangeInBusinessTimeZone,
   isValidDateString,
   todayInBusinessTimeZone
 } from '@src/helpers/time.helpers.js';
@@ -18,7 +17,7 @@ const auditActor = (context) => ({
   actorEmail: context?.user?.email ?? null
 });
 
-const { Order, Customer, Sequelize } = db;
+const { Order, Customer } = db;
 
 // Human-readable order numbers start here; existing lower numbers are preserved.
 const FIRST_ORDER_NO = 1010;
@@ -142,6 +141,24 @@ export class CreateOrderHandler extends BaseHandler {
     // Strict 10-digit phone, enforced in the service
     assertValidPhone(phone, this.traceId);
 
+    // Optional ledger day — defaults to today; past days allowed (back-dating
+    // a yesterday order), future days never.
+    const orderDate = this.args.date ?? todayInBusinessTimeZone();
+    if (!isValidDateString(orderDate)) {
+      throw new AppError(Errors.INVALID_INPUT, {
+        traceId: this.traceId,
+        field: 'date',
+        message: 'date must be a valid YYYY-MM-DD'
+      });
+    }
+    if (orderDate > todayInBusinessTimeZone()) {
+      throw new AppError(Errors.INVALID_INPUT, {
+        traceId: this.traceId,
+        field: 'date',
+        message: 'date cannot be in the future'
+      });
+    }
+
     // Required bahi-khata fields
     const village = assertValidVillage(this.args.village, this.traceId);
     assertOneOf('material', this.args.material, MATERIALS, this.traceId);
@@ -200,6 +217,7 @@ export class CreateOrderHandler extends BaseHandler {
         order = await Order.create(
           {
             order_no: nextNo,
+            order_date: orderDate,
             customer_id: customer.id,
             total_amount: totalAmount,
             amount_received: amountReceived,
@@ -234,8 +252,9 @@ export class CreateOrderHandler extends BaseHandler {
 
 export class ListOrdersHandler extends BaseHandler {
   /**
-   * Orders created on the given calendar day (YYYY-MM-DD, defaults to today),
-   * newest first, with the customer joined for the dashboard.
+   * Orders belonging to the given calendar day (YYYY-MM-DD, defaults to
+   * today) — matched on order_date, so back-dated orders appear on their
+   * ledger day — newest first, with the customer joined for the dashboard.
    */
   async run () {
     const { date } = this.args;
@@ -252,12 +271,9 @@ export class ListOrdersHandler extends BaseHandler {
         message: 'date cannot be in the future'
       });
     }
-    const { start, end } = dayRangeInBusinessTimeZone(date);
 
     return Order.findAll({
-      where: {
-        created_at: { [Sequelize.Op.gte]: start, [Sequelize.Op.lt]: end }
-      },
+      where: { order_date: date },
       include: [{ model: Customer, as: 'customer' }],
       order: [['order_no', 'DESC']]
     });

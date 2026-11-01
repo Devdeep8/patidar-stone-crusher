@@ -14,6 +14,8 @@ export interface OrderCustomer {
 export interface Order {
   id: string;
   order_no: number;
+  /** Business-local calendar day the order belongs to, "YYYY-MM-DD". */
+  order_date: string;
   customer_id: string;
   total_amount: number;
   amount_received: number;
@@ -45,6 +47,8 @@ export interface CreateOrderPayload {
   /** Optional — when omitted the backend computes quantity × rate. */
   total_amount?: number;
   amount_received?: number;
+  /** Optional ledger day — defaults to today; past days allowed. */
+  date?: string;
 }
 
 export const ordersService = {
