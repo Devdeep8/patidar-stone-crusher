@@ -9,9 +9,10 @@
 #   3. Add the Actions secrets below in GitHub → Settings → Secrets → Actions:
 #        DEPLOY_SSH_HOST, DEPLOY_SSH_USER, DEPLOY_SSH_KEY (private key), DEPLOY_SSH_PORT (optional, default 22)
 #
-# Order matters: migrations run BEFORE the new containers start, so the app
-# always boots against a schema it understands. Migrations are additive-only
-# by convention (see admin-backend/src/db/migrations).
+# Order matters: BUILD first (migrations live inside the admin-backend
+# image — running migrate on a stale image is a no-op), then MIGRATE, then
+# restart containers, so the app always boots against a schema it
+# understands. Migrations are additive-only by convention.
 #
 # Seeders are NOT run here — they create demo logins (superadmin@crm.com,
 # staff@crusher.com) and must never land in production. Run them by hand on
@@ -51,11 +52,11 @@ jobs:
 
             cd executor
 
+            echo "==> Building images (migrations ship inside them)"
+            docker compose -f docker-compose.production.yml build
+
             echo "==> Running migrations (before containers restart)"
             docker compose -f docker-compose.production.yml run --rm admin-backend npm run db:migrate
-
-            echo "==> Building images"
-            docker compose -f docker-compose.production.yml build
 
             echo "==> Restarting stack"
             docker compose -f docker-compose.production.yml up -d

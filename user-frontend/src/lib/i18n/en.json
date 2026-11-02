@@ -20,7 +20,33 @@
   "header": {
     "logout": "Log Out",
     "customers": "Customers",
-    "expenses": "Expenses"
+    "expenses": "Expenses",
+    "reports": "Reports"
+  },
+  "reports": {
+    "tabMonth": "Month",
+    "tabPending": "Pending (Udhaar)",
+    "thisMonth": "This Month",
+    "totalSale": "Total Sale",
+    "received": "Received",
+    "expense": "Expense",
+    "inHand": "In Hand This Month",
+    "inHandShort": "In Hand",
+    "inHandBreakdown": "Received {received} − Expense {expense}",
+    "pending": "Pending",
+    "ordersCount": "{count} orders this month",
+    "expenseBreakdown": "Expense Breakdown",
+    "monthWise": "Month by Month",
+    "yearChart": "Last 12 Months",
+    "inHandTrend": "In Hand Trend",
+    "month": "Month",
+    "colOrders": "Orders",
+    "totalToRecover": "Total Money To Recover",
+    "oldestDue": "Oldest due waiting {days} days",
+    "pendingSince": "Oldest pending: {date}",
+    "daysPending": "{days} days",
+    "noPending": "No pending udhaar — everything is collected.",
+    "loadFailed": "Could not load the report."
   },
   "dashboard": {
     "title": "Orders",

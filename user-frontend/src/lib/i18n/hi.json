@@ -20,7 +20,33 @@
   "header": {
     "logout": "लॉग आउट",
     "customers": "ग्राहक",
-    "expenses": "खर्च"
+    "expenses": "खर्च",
+    "reports": "रिपोर्ट"
+  },
+  "reports": {
+    "tabMonth": "महीना",
+    "tabPending": "बाकी उधार",
+    "thisMonth": "इस महीने",
+    "totalSale": "कुल बिक्री",
+    "received": "मिला हुआ",
+    "expense": "खर्च",
+    "inHand": "इस महीने हाथ में",
+    "inHandShort": "हाथ में",
+    "inHandBreakdown": "मिला {received} − खर्च {expense}",
+    "pending": "बाकी",
+    "ordersCount": "इस महीने {count} ऑर्डर",
+    "expenseBreakdown": "खर्च का ब्यौरा",
+    "monthWise": "महीने-दर-महीने",
+    "yearChart": "पिछले 12 महीने",
+    "inHandTrend": "हाथ में प्रवृत्ति",
+    "month": "महीना",
+    "colOrders": "ऑर्डर",
+    "totalToRecover": "कुल वसूली बाकी",
+    "oldestDue": "सबसे पुराना उधार {days} दिन से बाकी",
+    "pendingSince": "सबसे पुराना बाकी: {date}",
+    "daysPending": "{days} दिन",
+    "noPending": "कोई उधार बाकी नहीं — सब वसूल हो गया।",
+    "loadFailed": "रिपोर्ट लोड नहीं हुई।"
   },
   "dashboard": {
     "title": "ऑर्डर",

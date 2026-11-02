@@ -4,6 +4,7 @@ import authRoutes from "./auth.routes.js";
 import ordersRoutes from "./orders.routes.js";
 import customersRoutes from "./customers.routes.js";
 import expensesRoutes from "./expenses.routes.js";
+import reportsRoutes from "./reports.routes.js";
 import demoRoutes from "./demo.routes.js";
 import blogsRoutes from "./blogs.routes.js";
 const router = Router();
@@ -13,6 +14,7 @@ router.use("/auth", authRoutes);
 router.use("/orders", ordersRoutes);
 router.use("/customers", customersRoutes);
 router.use("/expenses", expensesRoutes);
+router.use("/reports", reportsRoutes);
 router.use("/demo", demoRoutes);
 router.use("/blogs", blogsRoutes);
 
