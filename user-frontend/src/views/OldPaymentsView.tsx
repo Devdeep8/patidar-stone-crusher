@@ -58,6 +58,7 @@ export function OldPaymentsView() {
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [stepperCalendarOpen, setStepperCalendarOpen] = useState(false);
 
   const isToday = day === currentDay();
 
@@ -135,7 +136,31 @@ export function OldPaymentsView() {
           <ChevronLeft className="size-8" />
         </button>
         <div className="flex h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 bg-white px-2 text-xl font-extrabold text-stone-900">
-          {fullDayLabel(day, lang)}
+          <Popover open={stepperCalendarOpen} onOpenChange={setStepperCalendarOpen}>
+            <PopoverTrigger
+              aria-label={t("oldPayments.date")}
+              title={t("oldPayments.date")}
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-orange-700 hover:bg-orange-50 active:bg-orange-100"
+            >
+              <CalendarDays className="size-7" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={dayToDate(day)}
+                defaultMonth={dayToDate(day)}
+                // Future days are not selectable
+                disabled={{ after: dayToDate(currentDay()) }}
+                onSelect={(selected) => {
+                  if (selected) {
+                    setDay(dateToDay(selected));
+                    setStepperCalendarOpen(false);
+                  }
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+          <span className="min-w-0 truncate">{fullDayLabel(day, lang)}</span>
           {!isToday && (
             <button
               type="button"

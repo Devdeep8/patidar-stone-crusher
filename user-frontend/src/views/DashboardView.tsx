@@ -7,9 +7,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarClock, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { CalendarClock, CalendarDays, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { StatusBadge } from "@/components/StatusBadge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { currentDay, formatINR, fullDayLabel, shiftDay } from "@/lib/format";
 import { ordersService, type Order } from "@/services/orders.service";
 import { expensesService, type DayExpenses } from "@/services/expenses.service";
@@ -39,6 +41,18 @@ export function DashboardView() {
   const [oldPayments, setOldPayments] = useState<DayOldPayments | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  // "YYYY-MM-DD" <-> Date for the calendar, anchored at noon UTC so the
+  // calendar day never shifts across timezones.
+  const dayToDate = (day: string) => {
+    const [y, m, d] = day.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d, 12));
+  };
+  const dateToDay = (date: Date) => {
+    const shifted = new Date(date.getTime() + 12 * 60 * 60 * 1000);
+    return shifted.toISOString().slice(0, 10);
+  };
 
   const load = useCallback(async (targetDay: string) => {
     setLoading(true);
@@ -111,7 +125,31 @@ export function DashboardView() {
           <ChevronLeft className="size-8" />
         </button>
         <div className="flex h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 bg-white px-2 text-xl font-extrabold text-stone-900">
-          {fullDayLabel(day, lang)}
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger
+              aria-label={t("dashboard.title")}
+              title={t("dashboard.title")}
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-orange-700 hover:bg-orange-50 active:bg-orange-100"
+            >
+              <CalendarDays className="size-7" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={dayToDate(day)}
+                defaultMonth={dayToDate(day)}
+                // Future days are not selectable
+                disabled={{ after: dayToDate(currentDay()) }}
+                onSelect={(selected) => {
+                  if (selected) {
+                    setDay(dateToDay(selected));
+                    setCalendarOpen(false);
+                  }
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+          <span className="min-w-0 truncate">{fullDayLabel(day, lang)}</span>
           {!isToday && (
             <button
               type="button"
