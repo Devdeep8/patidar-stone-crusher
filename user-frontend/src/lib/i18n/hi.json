@@ -21,6 +21,7 @@
     "logout": "लॉग आउट",
     "customers": "ग्राहक",
     "expenses": "खर्च",
+    "oldPayments": "पुराना पैसा",
     "reports": "रिपोर्ट"
   },
   "reports": {
@@ -29,10 +30,11 @@
     "thisMonth": "इस महीने",
     "totalSale": "कुल बिक्री",
     "received": "मिला हुआ",
+    "oldPayments": "पुराना पेमेंट",
     "expense": "खर्च",
     "inHand": "इस महीने हाथ में",
     "inHandShort": "हाथ में",
-    "inHandBreakdown": "मिला {received} − खर्च {expense}",
+    "inHandBreakdown": "मिला {received} + पुराना {old} − खर्च {expense}",
     "pending": "बाकी",
     "ordersCount": "इस महीने {count} ऑर्डर",
     "expenseBreakdown": "खर्च का ब्यौरा",
@@ -63,8 +65,10 @@
     "today": "आज",
     "dayExpense": "आज का खर्च",
     "addExpense": "+ खर्च जोड़ें",
+    "dayOldPayments": "पुराना पैसा मिला",
+    "addOldPayment": "+ पुराना पेमेंट जोड़ें",
     "netIncome": "आज की कमाई (हाथ में)",
-    "netIncomeBreakdown": "मिला {received} − खर्च {expense} (बाकी उधार: {pending})"
+    "netIncomeBreakdown": "मिला {received} + पुराना {old} − खर्च {expense} (बाकी उधार: {pending})"
   },
   "expenses": {
     "title": "खर्च",
@@ -89,6 +93,27 @@
     "maintenance": "मरम्मत",
     "wages": "मज़दूरी",
     "other": "अन्य"
+  },
+  "oldPayments": {
+    "title": "पुराना पेमेंट",
+    "addTitle": "पुराना पेमेंट जोड़ें",
+    "addHint": "पुराने ऑर्डर का पैसा आज मिला — ऑर्डर की ज़रूरत नहीं, सिर्फ किसने दिया",
+    "date": "पैसा मिलने की तारीख",
+    "payerName": "किसने दिया (नाम)",
+    "amount": "रकम (₹)",
+    "note": "नोट (वैकल्पिक)",
+    "notePlaceholder": "जैसे: रमेश, जमुनिया — पिछले साल की गिट्टी का",
+    "save": "पेमेंट सेव करें",
+    "saving": "सेव हो रहा है…",
+    "dayTotal": "आज का पुराना पेमेंट",
+    "delete": "एंट्री हटाएं",
+    "noEntries": "इस दिन कोई पुराना पेमेंट नहीं।",
+    "noEntriesHint": "जब कोई पुराने ऑर्डर का पैसा दे, ऊपर दर्ज करें।",
+    "loadFailed": "पुराना पेमेंट लोड नहीं हो सका।",
+    "errorName": "किसने दिया, यह लिखें",
+    "errorAmount": "0 से बड़ी रकम लिखें",
+    "errorSave": "पेमेंट सेव नहीं हुआ। फिर कोशिश करें।",
+    "errorDelete": "एंट्री हटाई नहीं जा सकी। फिर कोशिश करें।"
   },
   "orderForm": {
     "title": "नया ऑर्डर",

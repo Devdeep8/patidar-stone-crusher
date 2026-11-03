@@ -9,7 +9,7 @@ import { AppError } from '@src/errors/app.error.js';
 import Errors from '@src/errors/errorCodes.js';
 import { todayInBusinessTimeZone } from '@src/helpers/time.helpers.js';
 
-const { Order, Expense, Customer, Sequelize } = db;
+const { Order, Expense, OldPayment, Customer, Sequelize } = db;
 
 const MONTH_PATTERN = /^\d{4}-\d{2}$/;
 const MONTHS_IN_TABLE = 12;
@@ -87,8 +87,19 @@ const monthReport = async (month, transaction) => {
     transaction
   });
 
+  const oldPaymentRow = await OldPayment.findOne({
+    attributes: [
+      [Sequelize.fn('SUM', Sequelize.col('amount')), 'total_old_payments']
+    ],
+    where: {
+      payment_date: { [Sequelize.Op.gte]: start, [Sequelize.Op.lt]: end }
+    },
+    transaction
+  });
+
   const totalSale = Number(orderRow?.get('total_sale')) || 0;
   const totalReceived = Number(orderRow?.get('total_received')) || 0;
+  const totalOldPayments = Number(oldPaymentRow?.get('total_old_payments')) || 0;
   const expensesByCategory = {};
   let totalExpense = 0;
   for (const row of expenseRows) {
@@ -102,10 +113,12 @@ const monthReport = async (month, transaction) => {
     orders_count: Number(orderRow?.get('orders_count')) || 0,
     total_sale: totalSale,
     total_received: totalReceived,
+    // Money collected this month for pre-app orders (no order row exists)
+    old_payments_total: totalOldPayments,
     total_expense: totalExpense,
-    // Real cash generated this month: received minus spent. Pending udhaar
-    // is NOT counted — it is not in hand yet.
-    in_hand: totalReceived - totalExpense,
+    // Real cash generated this month: received (incl. old payments) minus
+    // spent. Pending udhaar is NOT counted — it is not in hand yet.
+    in_hand: totalReceived + totalOldPayments - totalExpense,
     // This month's billed money not yet collected (across all months until paid)
     pending: Math.max(0, totalSale - totalReceived),
     expenses_by_category: expensesByCategory
@@ -184,9 +197,27 @@ export class MonthsReportHandler extends BaseHandler {
       transaction: this.dbTransaction
     });
 
+    const oldPaymentRows = await OldPayment.findAll({
+      attributes: [
+        [monthOf('payment_date'), 'month'],
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total_old_payments']
+      ],
+      where: {
+        payment_date: {
+          [Sequelize.Op.gte]: monthDayRange(shiftMonth(current, -(MONTHS_IN_TABLE - 1))).start,
+          [Sequelize.Op.lt]: monthDayRange(current).end
+        }
+      },
+      group: [monthOf('payment_date')],
+      transaction: this.dbTransaction
+    });
+
     const ordersByMonth = sumOrdersByMonth(orderRows);
     const expenseByMonth = new Map(
       expenseRows.map((row) => [row.getDataValue('month'), Number(row.get('total_expense')) || 0])
+    );
+    const oldPaymentByMonth = new Map(
+      oldPaymentRows.map((row) => [row.getDataValue('month'), Number(row.get('total_old_payments')) || 0])
     );
 
     // Fill all 12 months (empty months show zeros) — gaps hide the trend
@@ -195,6 +226,7 @@ export class MonthsReportHandler extends BaseHandler {
       const month = shiftMonth(current, -i);
       const orders = ordersByMonth.get(month);
       const totalExpense = expenseByMonth.get(month) ?? 0;
+      const totalOldPayments = oldPaymentByMonth.get(month) ?? 0;
       const totalSale = orders?.totalSale ?? 0;
       const totalReceived = orders?.totalReceived ?? 0;
       months.push({
@@ -202,8 +234,9 @@ export class MonthsReportHandler extends BaseHandler {
         orders_count: orders?.ordersCount ?? 0,
         total_sale: totalSale,
         total_received: totalReceived,
+        old_payments_total: totalOldPayments,
         total_expense: totalExpense,
-        in_hand: totalReceived - totalExpense,
+        in_hand: totalReceived + totalOldPayments - totalExpense,
         pending: Math.max(0, totalSale - totalReceived)
       });
     }

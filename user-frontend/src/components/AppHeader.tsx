@@ -25,24 +25,31 @@ export function AppHeader() {
           {user?.name ? <p className="truncate text-sm text-stone-500">{user.name}</p> : null}
         </Link>
 
-        <div className="order-2 flex w-full gap-2 sm:order-none sm:w-auto">
+        <div className="order-2 flex w-full gap-1.5 sm:order-none sm:w-auto sm:gap-2">
           <Link
             href="/customers"
-            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-stone-300 px-3 text-base font-bold text-stone-700 hover:bg-stone-100 active:bg-stone-200 sm:justify-start sm:px-4 sm:text-lg"
+            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-stone-300 px-1.5 text-sm font-bold whitespace-nowrap text-stone-700 hover:bg-stone-100 active:bg-stone-200 sm:justify-start sm:px-4 sm:text-lg"
           >
             {t("header.customers")}
           </Link>
 
           <Link
             href="/expenses"
-            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-stone-300 px-3 text-base font-bold text-stone-700 hover:bg-stone-100 active:bg-stone-200 sm:justify-start sm:px-4 sm:text-lg"
+            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-stone-300 px-1.5 text-sm font-bold whitespace-nowrap text-stone-700 hover:bg-stone-100 active:bg-stone-200 sm:justify-start sm:px-4 sm:text-lg"
           >
             {t("header.expenses")}
           </Link>
 
           <Link
+            href="/old-payments"
+            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-stone-300 px-1.5 text-sm font-bold whitespace-nowrap text-stone-700 hover:bg-stone-100 active:bg-stone-200 sm:justify-start sm:px-4 sm:text-lg"
+          >
+            {t("header.oldPayments")}
+          </Link>
+
+          <Link
             href="/reports"
-            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-orange-600 px-3 text-base font-bold text-orange-700 hover:bg-orange-50 active:bg-orange-100 sm:justify-start sm:px-4 sm:text-lg"
+            className="flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-orange-600 px-1.5 text-sm font-bold whitespace-nowrap text-orange-700 hover:bg-orange-50 active:bg-orange-100 sm:justify-start sm:px-4 sm:text-lg"
           >
             {t("header.reports")}
           </Link>

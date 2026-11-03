@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { currentDay, formatINR, fullDayLabel, shiftDay } from "@/lib/format";
 import { ordersService, type Order } from "@/services/orders.service";
 import { expensesService, type DayExpenses } from "@/services/expenses.service";
+import { oldPaymentsService, type DayOldPayments } from "@/services/oldPayments.service";
 
 export function DashboardView() {
   const { t, lang } = useLanguage();
@@ -35,6 +36,7 @@ export function DashboardView() {
 
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [expenses, setExpenses] = useState<DayExpenses | null>(null);
+  const [oldPayments, setOldPayments] = useState<DayOldPayments | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
@@ -42,15 +44,17 @@ export function DashboardView() {
     setLoading(true);
     setFailed(false);
     try {
-      // Both calls together — the expense total is part of the day's ledger;
-      // an expense-list failure must not blank the orders.
-      const [ordersResult, expensesResult] = await Promise.allSettled([
+      // All calls together — the expense and old-payment totals are part of
+      // the day's ledger; a list failure must not blank the orders.
+      const [ordersResult, expensesResult, oldPaymentsResult] = await Promise.allSettled([
         ordersService.listByDay(targetDay),
-        expensesService.listByDay(targetDay)
+        expensesService.listByDay(targetDay),
+        oldPaymentsService.listByDay(targetDay)
       ]);
       if (ordersResult.status === "rejected") throw ordersResult.reason;
       setOrders(ordersResult.value);
       setExpenses(expensesResult.status === "fulfilled" ? expensesResult.value : null);
+      setOldPayments(oldPaymentsResult.status === "fulfilled" ? oldPaymentsResult.value : null);
     } catch {
       setOrders(null);
       setFailed(true);
@@ -68,7 +72,11 @@ export function DashboardView() {
   const summary = useMemo(() => {
     const list = orders ?? [];
     const totalAmount = list.reduce((sum, order) => sum + order.total_amount, 0);
-    const totalReceived = list.reduce((sum, order) => sum + order.amount_received, 0);
+    const orderReceived = list.reduce((sum, order) => sum + order.amount_received, 0);
+    // Old payments are money received this day for pre-app orders — they are
+    // real cash in, so they count in the day's received and net income.
+    const oldReceived = oldPayments?.total ?? 0;
+    const totalReceived = orderReceived + oldReceived;
     // Real cash in hand for the operator: received minus the day's expenses.
     // Pending (udhaar) money is NOT counted — it's not in hand yet.
     const netIncome = totalReceived - (expenses?.total ?? 0);
@@ -76,10 +84,12 @@ export function DashboardView() {
       count: list.length,
       totalAmount,
       totalReceived,
-      pending: Math.max(0, totalAmount - totalReceived),
+      orderReceived,
+      oldReceived,
+      pending: Math.max(0, totalAmount - orderReceived),
       netIncome,
     };
-  }, [orders, expenses]);
+  }, [orders, expenses, oldPayments]);
 
   const cards = [
     { label: t("dashboard.totalOrders"), value: String(summary.count), tone: "text-stone-900" },
@@ -155,7 +165,8 @@ export function DashboardView() {
         </p>
         <p className="mt-1 text-base font-semibold text-stone-500">
           {t("dashboard.netIncomeBreakdown", {
-            received: formatINR(summary.totalReceived),
+            received: formatINR(summary.orderReceived),
+            old: formatINR(summary.oldReceived),
             expense: formatINR(expenses?.total ?? 0),
             pending: formatINR(summary.pending),
           })}
@@ -176,6 +187,24 @@ export function DashboardView() {
         {isToday ? (
           <span className="rounded-xl bg-orange-600 px-4 py-2 text-lg font-bold text-white">
             {t("dashboard.addExpense")}
+          </span>
+        ) : null}
+      </Link>
+
+      {/* Old payments received this day — money for pre-app orders */}
+      <Link
+        href="/old-payments"
+        className="mt-3 flex items-center justify-between rounded-xl border-2 border-stone-200 bg-white p-4 hover:border-orange-300 active:bg-orange-50"
+      >
+        <div>
+          <p className="text-base font-semibold text-stone-500">{t("dashboard.dayOldPayments")}</p>
+          <p className="mt-1 text-2xl font-extrabold text-green-700">
+            {oldPayments ? formatINR(oldPayments.total) : "—"}
+          </p>
+        </div>
+        {isToday ? (
+          <span className="rounded-xl bg-orange-600 px-4 py-2 text-lg font-bold text-white">
+            {t("dashboard.addOldPayment")}
           </span>
         ) : null}
       </Link>

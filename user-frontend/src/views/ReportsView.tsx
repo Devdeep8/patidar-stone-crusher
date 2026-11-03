@@ -324,6 +324,7 @@ export function ReportsView() {
                 <p className="mt-1 text-base font-semibold text-stone-500">
                   {t("reports.inHandBreakdown", {
                     received: formatINR(report.total_received),
+                    old: formatINR(report.old_payments_total),
                     expense: formatINR(report.total_expense),
                   })}
                 </p>
@@ -456,6 +457,7 @@ export function ReportsView() {
                         <th className="px-3 py-2 text-right">{t("reports.colOrders")}</th>
                         <th className="px-3 py-2 text-right">{t("reports.totalSale")}</th>
                         <th className="px-3 py-2 text-right">{t("reports.received")}</th>
+                        <th className="px-3 py-2 text-right">{t("reports.oldPayments")}</th>
                         <th className="px-3 py-2 text-right">{t("reports.expense")}</th>
                         <th className="px-3 py-2 text-right">{t("reports.inHandShort")}</th>
                         <th className="px-3 py-2 text-right">{t("reports.pending")}</th>
@@ -481,6 +483,9 @@ export function ReportsView() {
                           </td>
                           <td className="px-3 py-2 text-right text-base text-green-700">
                             {formatINR(row.total_received)}
+                          </td>
+                          <td className="px-3 py-2 text-right text-base text-green-700">
+                            {row.old_payments_total > 0 ? formatINR(row.old_payments_total) : "—"}
                           </td>
                           <td className="px-3 py-2 text-right text-base text-stone-900">
                             {formatINR(row.total_expense)}

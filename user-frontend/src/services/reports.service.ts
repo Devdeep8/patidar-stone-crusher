@@ -9,8 +9,10 @@ export interface MonthlyReport {
   orders_count: number;
   total_sale: number;
   total_received: number;
+  /** Money collected this month for pre-app orders (no order row exists) */
+  old_payments_total: number;
   total_expense: number;
-  /** Received − expense: real cash generated this month (udhaar excluded) */
+  /** Received (incl. old payments) − expense: real cash generated this month */
   in_hand: number;
   /** This month's billed money not yet collected */
   pending: number;
@@ -23,6 +25,7 @@ export interface MonthSummary {
   orders_count: number;
   total_sale: number;
   total_received: number;
+  old_payments_total: number;
   total_expense: number;
   in_hand: number;
   pending: number;

@@ -21,6 +21,7 @@
     "logout": "Log Out",
     "customers": "Customers",
     "expenses": "Expenses",
+    "oldPayments": "Old Payments",
     "reports": "Reports"
   },
   "reports": {
@@ -29,10 +30,11 @@
     "thisMonth": "This Month",
     "totalSale": "Total Sale",
     "received": "Received",
+    "oldPayments": "Old Payments",
     "expense": "Expense",
     "inHand": "In Hand This Month",
     "inHandShort": "In Hand",
-    "inHandBreakdown": "Received {received} − Expense {expense}",
+    "inHandBreakdown": "Received {received} + Old {old} − Expense {expense}",
     "pending": "Pending",
     "ordersCount": "{count} orders this month",
     "expenseBreakdown": "Expense Breakdown",
@@ -63,8 +65,10 @@
     "today": "Today",
     "dayExpense": "Day's Expense",
     "addExpense": "+ Add Expense",
+    "dayOldPayments": "Old Payments Received",
+    "addOldPayment": "+ Add Old Payment",
     "netIncome": "Net Income (in hand)",
-    "netIncomeBreakdown": "Received {received} − Expense {expense} (pending udhaar: {pending})"
+    "netIncomeBreakdown": "Received {received} + Old {old} − Expense {expense} (pending udhaar: {pending})"
   },
   "expenses": {
     "title": "Expenses",
@@ -89,6 +93,27 @@
     "maintenance": "Repair / Maintenance",
     "wages": "Wages",
     "other": "Other"
+  },
+  "oldPayments": {
+    "title": "Old Payments",
+    "addTitle": "Add Old Payment",
+    "addHint": "Money received for an old (pre-app) order — no order needed, just who paid",
+    "date": "Date Money Received",
+    "payerName": "Who paid (name)",
+    "amount": "Amount (₹)",
+    "note": "Note (optional)",
+    "notePlaceholder": "e.g. Ramesh, Jamuniya — paid for last year's gitti",
+    "save": "Save Payment",
+    "saving": "Saving…",
+    "dayTotal": "Day's Old Payments",
+    "delete": "Delete entry",
+    "noEntries": "No old payments this day.",
+    "noEntriesHint": "When someone pays for an old order, record it above.",
+    "loadFailed": "Could not load old payments.",
+    "errorName": "Enter who paid",
+    "errorAmount": "Enter an amount greater than 0",
+    "errorSave": "Could not save the payment. Please try again.",
+    "errorDelete": "Could not delete the entry. Please try again."
   },
   "orderForm": {
     "title": "New Order",
